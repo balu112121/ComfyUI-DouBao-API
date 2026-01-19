@@ -1,2 +1,74 @@
-# ComfyUI-DouBao-API
-ComfyUI-DouBao-API 豆包AI调用免费生成图像，在Comfyui也可以用豆包AI还免费！
+# ComfyUI Volcano Engine Seedream Node
+
+## 📝 更新日志
+
+### 2025/12/05更新
+- 新增 `doubao-seedream-4-5-251128` 模型支持
+- 修复文生图报错的问题
+- 补充 `size` 参数选项，新增多种常用宽高比尺寸（1:1, 4:3, 3:4, 16:9, 9:16, 3:2, 2:3, 21:9）
+- 新增 `optimize_prompt_mode` 提示词优化功能，支持 `standard` 和 `fast` 两种模式，该参数仅支持`doubao-seedream-4-5`
+- 新增 `sequential_image_generation` 组图功能
+
+![sequential_image_example](./workflow/seqential_image.png)
+*组图功能示例*
+---
+
+这是一个为 [ComfyUI](https://github.com/comfyanonymous/ComfyUI) 设计的自定义节点，它允许用户直接在 ComfyUI 的工作流中调用**火山引擎（Volcano Engine）**的 [豆包·Seedream](https://www.volcengine.com/product/doubao-seedream) 系列大模型，实现强大的图生图功能。
+
+
+*   **无缝集成**：将火山引擎的先进图像生成能力带入 ComfyUI 的节点式工作流。
+*   **高度灵活**：API 地址（`api_url`）可作为输入项，方便用户切换不同的代理或API端点。
+*   **参数可调**：所有核心 API 参数（如 `prompt`, `strength`, `seed`, `size` 等）均可在节点UI上进行可视化调整。
+*   **支持单图生图**：输入一张图片，根据文本提示生成新的创意图像。
+*   **支持多图参考（组图）**：输入一个批次（Batch）的图片作为参考，实现更复杂的图像生成任务。
+*   **安全便捷**：API Key 和 URL 直接在节点内输入，无需硬编码在代码中。
+*   **实时反馈**：API 的调用状态、耗时和错误信息会实时打印在 ComfyUI 的控制台窗口，方便调试。
+
+
+## 🚀 使用方法
+
+安装并重启后，你可以在 ComfyUI 中通过以下方式添加节点：
+*   双击画布，搜索 `Volcano Engine API`。
+*   右键菜单 -> `Add Node` -> `Volcano Engine API` -> `火山引擎(Volcano API)`。
+
+### 基本用法 (单图生图)
+
+![node_preview](./workflow/example.png)
+
+### 高级用法 (生成组图)
+
+![sequential_image_example](./workflow/seqential_image.png)
+
+
+## ⚙️ 节点参数详解
+
+| 参数                          | 类型      | 描述                                                                                              |
+| ----------------------------- | --------- | ------------------------------------------------------------------------------------------------- |
+| `image`                       | `IMAGE`   | 输入的原始图片或图片批次。                                                                        |
+| `api_url`                     | `STRING`  | API 请求的目标地址。默认为官方地址，可修改以使用代理或其它端点。                       |
+| `api_key`                     | `STRING`  | 你的火山引擎 API Key。                                                                            |
+| `prompt`                      | `STRING`  | 文本提示，用于指导图像的生成方向。                                                                |
+| `seed`                        | `INT`     | **新增！** 随机数种子，用于控制生成内容的随机性。取值范围 `[-1, 2147483647]`，设置为 `-1` 时使用随机种子。 |
+| `model`                       | `STRING`  | 选择要使用的模型。目前多图功能仅 `doubao-seedream-4-0-250828` 支持。                                 |
+| `size`                        | `STRING`  | 指定输出图像的尺寸。选择 `auto` 时，API 会根据输入图片自动判断尺寸，这是图生图模式下的推荐选项。 |
+| `watermark`                   | `BOOLEAN` | 是否在生成的图片上添加水印。                                                                      |
+| `sequential_image_generation` | `STRING`  | 组图功能开关。设置为 `auto` 以启用多图参考，生成组图模式，`disabled` 则为单图模式（即使输入多图也会被逐一处理）。|
+| `max_images`                  | `INT`     | 当组图功能为 `auto` 时生效，指定 API 最多返回的图片数量（1-15）。                                      |
+| `optimize_prompt_mode`        | `STRING`  | 提示词优化功能。`disabled` 为关闭，`standard` 为标准模式（质量更高，耗时较长），`fast` 为快速模式（耗时更短，质量一般）。仅 `doubao-seedream-4-5`支持。 |
+
+## ⁉️ 故障排查
+
+*   **节点未出现**：请确认你已完全重启 ComfyUI，并且 `requirements.txt` 中的依赖已成功安装。
+*   **API 报错**：请检查你的 ComfyUI 命令行窗口。节点会将火山引擎服务器返回的详细错误信息（如 API Key 无效、参数错误等）打印出来，这有助于定位问题。
+*   **API 请求失败 (API request failed)**：如果控制台日志中没有具体的服务器错误信息，请检查：
+    1.  你的网络连接是否正常。
+    2.  `api_url` 字段是否填写了一个**完整且有效**的网址（必须以 `http://` 或 `https://` 开头）。
+    3.  `api_key` 和 `api_url` 是否填反了。
+
+## 🤝 贡献
+
+欢迎提交 Pull Requests 或在 Issues 中报告错误、提出功能建议。
+
+## 📜 许可证
+
+本项目采用 [MIT License](./LICENSE) 开源。
